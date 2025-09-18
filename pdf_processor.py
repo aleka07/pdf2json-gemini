@@ -2,8 +2,10 @@ import os
 import json
 import logging
 from pathlib import Path
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 import google.generativeai as genai
+import concurrent.futures
+import threading
 
 # Configure logging
 import time
@@ -332,11 +334,11 @@ Please analyze the uploaded PDF and generate a JSON response following the exact
 
             results["files"].append(file_result)
 
-            # Add a small delay between files to avoid overwhelming the API
+            # Reduced delay between files (was 5 seconds)
             if idx < len(pdf_files):  # Don't wait after the last file
-                logger.info("Waiting 5 seconds before next file...")
+                logger.info("Waiting 1 second before next file...")
                 import time
-                time.sleep(5)
+                time.sleep(1)
 
         # Final summary
         logger.info(f"""
@@ -492,11 +494,11 @@ Please analyze the uploaded PDF and generate a JSON response following the exact
             if idx % 5 == 0:  # Save progress every 5 files
                 logger.info(f"💾 Checkpoint: Processed {results['processed']}/{len(pdf_files)} files")
 
-            # Add delay between files
+            # Reduced delay between files (was 5 seconds)
             if idx < len(pdf_files):
-                logger.info("Waiting 5 seconds before next file...")
+                logger.info("Waiting 1 second before next file...")
                 import time
-                time.sleep(5)
+                time.sleep(1)
 
         # Final summary
         logger.info(f"""
@@ -608,11 +610,11 @@ Please analyze the uploaded PDF and generate a JSON response following the exact
             if (idx - start_from + 1) % 5 == 0:
                 logger.info(f"💾 Checkpoint: Processed {results['processed']}/{len(pdf_files)} files")
 
-            # Add delay between files
+            # Reduced delay between files (was 5 seconds)
             if idx < len(pdf_files) + start_from - 1:
-                logger.info("Waiting 5 seconds before next file...")
+                logger.info("Waiting 1 second before next file...")
                 import time
-                time.sleep(5)
+                time.sleep(1)
 
         # Final summary
         total_attempted = results['processed'] + results['failed']
@@ -625,6 +627,136 @@ Please analyze the uploaded PDF and generate a JSON response following the exact
         - Failed: {results['failed']}
         - Skipped: {results['skipped']}
         - Success rate: {success_rate:.1f}%
+        """)
+
+        self.save_processing_summary(results, section_code)
+        return results
+
+    def process_single_pdf_with_logging(self, pdf_file: Path, section_code: str, sequence_id: int) -> Dict[str, Any]:
+        """
+        Thread-safe wrapper for processing a single PDF with detailed logging.
+        """
+        file_result = {
+            "filename": pdf_file.name,
+            "sequence_id": sequence_id,
+            "paper_id": f"{section_code}-{sequence_id:03d}",
+            "success": False,
+            "error": None,
+            "start_time": datetime.now().isoformat(),
+            "end_time": None
+        }
+
+        try:
+            logger.info(f"🔄 [{sequence_id:03d}] Starting: {pdf_file.name}")
+            success = self.process_single_pdf(str(pdf_file), section_code, sequence_id)
+            file_result["end_time"] = datetime.now().isoformat()
+
+            if success:
+                file_result["success"] = True
+                logger.info(f"✅ [{sequence_id:03d}] Completed: {pdf_file.name}")
+            else:
+                file_result["error"] = "Processing failed"
+                logger.error(f"❌ [{sequence_id:03d}] Failed: {pdf_file.name}")
+
+        except Exception as e:
+            file_result["error"] = str(e)
+            file_result["end_time"] = datetime.now().isoformat()
+            logger.error(f"❌ [{sequence_id:03d}] Error in {pdf_file.name}: {str(e)}")
+
+        return file_result
+
+    def process_pdfs_parallel(self, directory_path: str, section_code: str, max_workers: int = 3) -> Dict[str, Any]:
+        """
+        Process PDFs in parallel using ThreadPoolExecutor.
+
+        Args:
+            directory_path (str): Path to directory containing PDFs
+            section_code (str): Project section code
+            max_workers (int): Maximum number of parallel workers (default: 3)
+        """
+        # Set up logging
+        global logger
+        logger, _ = setup_logging(section_code)
+
+        directory = Path(directory_path)
+        if not directory.exists() or not directory.is_dir():
+            logger.error(f"Directory not found: {directory_path}")
+            return {"success": False, "error": "Directory not found"}
+
+        # Get all PDF files and sort them for consistent ordering
+        pdf_files = sorted(list(directory.glob("*.pdf")), key=lambda x: x.name.lower())
+        if not pdf_files:
+            logger.warning(f"No PDF files found in {directory_path}")
+            return {"success": True, "processed": 0, "failed": 0, "files": []}
+
+        # Log the processing order
+        logger.info("📋 Processing order (PARALLEL MODE):")
+        for idx, pdf_file in enumerate(pdf_files, 1):
+            logger.info(f"  {idx:2d}. {pdf_file.name}")
+        logger.info("")
+
+        logger.info(f"🚀 Starting parallel processing with {max_workers} workers")
+        logger.info(f"📊 Found {len(pdf_files)} PDF files to process")
+
+        results = {
+            "success": True,
+            "total_files": len(pdf_files),
+            "processed": 0,
+            "failed": 0,
+            "files": [],
+            "parallel_workers": max_workers
+        }
+
+        # Process PDFs in parallel
+        try:
+            with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+                # Submit all tasks
+                future_to_pdf = {}
+                for idx, pdf_file in enumerate(pdf_files, 1):
+                    future = executor.submit(
+                        self.process_single_pdf_with_logging,
+                        pdf_file,
+                        section_code,
+                        idx
+                    )
+                    future_to_pdf[future] = (pdf_file, idx)
+
+                # Collect results as they complete
+                completed = 0
+                for future in concurrent.futures.as_completed(future_to_pdf):
+                    pdf_file, idx = future_to_pdf[future]
+                    completed += 1
+
+                    try:
+                        file_result = future.result()
+                        results["files"].append(file_result)
+
+                        if file_result["success"]:
+                            results["processed"] += 1
+                        else:
+                            results["failed"] += 1
+
+                        # Progress update
+                        progress = (completed / len(pdf_files)) * 100
+                        logger.info(f"📈 Progress: {completed}/{len(pdf_files)} ({progress:.1f}%) - Last completed: {pdf_file.name}")
+
+                    except Exception as e:
+                        results["failed"] += 1
+                        logger.error(f"❌ Exception in parallel processing for {pdf_file.name}: {str(e)}")
+
+        except Exception as e:
+            logger.error(f"❌ Critical error in parallel processing: {str(e)}")
+            results["success"] = False
+            return results
+
+        # Final summary
+        logger.info(f"""
+        🎉 Parallel Processing Complete:
+        - Total files: {results['total_files']}
+        - Successfully processed: {results['processed']}
+        - Failed: {results['failed']}
+        - Success rate: {(results['processed']/results['total_files']*100):.1f}%
+        - Workers used: {max_workers}
         """)
 
         self.save_processing_summary(results, section_code)

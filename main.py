@@ -51,7 +51,7 @@ def find_available_sections():
 
     return sorted(sections)
 
-def process_section(processor, section_code, use_resume=False, start_from=1, resume_method="smart"):
+def process_section(processor, section_code, use_resume=False, start_from=1, resume_method="smart", parallel=False, workers=3):
     """Process all PDFs in a specific section."""
     directory_path = f"data/input/{section_code}"
 
@@ -62,18 +62,26 @@ def process_section(processor, section_code, use_resume=False, start_from=1, res
     print(f"\n🔄 Processing Section {section_code}: {SECTION_DESCRIPTIONS.get(section_code, 'Unknown section')}")
     print(f"📁 Directory: {directory_path}")
 
-    if use_resume:
+    if parallel:
+        print(f"🚀 Using PARALLEL processing with {workers} workers")
+        print(f"⚡ This will be MUCH faster!")
+    elif use_resume:
         print(f"🔄 Using {resume_method} resume functionality")
         if start_from > 1:
             print(f"📍 Starting from sequence {start_from}")
 
     # Process the directory
-    if use_resume:
+    if parallel:
+        # Parallel processing (fastest)
+        results = processor.process_pdfs_parallel(directory_path, section_code, workers)
+    elif use_resume:
+        # Resume processing
         if resume_method == "simple":
             results = processor.process_pdfs_in_directory_with_resume(directory_path, section_code, start_from)
         else:  # smart method
             results = processor.process_pdfs_with_resume(directory_path, section_code, start_from)
     else:
+        # Sequential processing
         results = processor.process_pdfs_in_directory(directory_path, section_code)
 
     if results["success"]:
@@ -83,6 +91,8 @@ def process_section(processor, section_code, use_resume=False, start_from=1, res
             print(f"⚠️  Failed: {results['failed']} files")
         if results.get('skipped', 0) > 0:
             print(f"⏭️  Skipped: {results['skipped']} files")
+        if results.get('parallel_workers'):
+            print(f"🚀 Used {results['parallel_workers']} parallel workers")
     else:
         print(f"\n❌ Section {section_code} failed: {results.get('error', 'Unknown error')}")
         return False
@@ -142,10 +152,11 @@ def main():
 Examples:
     python main.py --list                                 # List available sections
     python main.py --list-files 3.1                      # List files in section 3.1 with numbers and status
-    python main.py --section 3.1                         # Process all PDFs in section 3.1
+    python main.py --section 3.1 --parallel              # Process section 3.1 in PARALLEL (3x faster!)
+    python main.py --section 3.1 --parallel --workers 5  # Use 5 parallel workers (max speed)
     python main.py --section 3.1 --use-resume           # Process section 3.1 with smart resume (skip already processed)
     python main.py --resume 3.1 --start-from 26         # Resume section 3.1 from sequence 26
-    python main.py --all --use-resume                    # Process all sections with smart resume
+    python main.py --all --parallel                     # Process all sections in parallel (fastest)
     python main.py --file paper.pdf                     # Process a single PDF file
         """
     )
@@ -162,6 +173,8 @@ Examples:
     parser.add_argument("--start-from", type=int, help="Start processing from specific sequence number (for resume)")
     parser.add_argument("--use-resume", action="store_true", help="Use smart resume functionality that skips already processed files")
     parser.add_argument("--resume-method", choices=["smart", "simple"], default="smart", help="Resume method: 'smart' (sequence-based) or 'simple' (filename-based)")
+    parser.add_argument("--parallel", action="store_true", help="Use parallel processing for faster execution")
+    parser.add_argument("--workers", type=int, default=3, help="Number of parallel workers (default: 3, max recommended: 5)")
 
     args = parser.parse_args()
 
@@ -242,7 +255,7 @@ Examples:
             return 1
 
         start_from = args.start_from or 1
-        success = process_section(processor, args.section, args.use_resume, start_from, args.resume_method)
+        success = process_section(processor, args.section, args.use_resume, start_from, args.resume_method, args.parallel, args.workers)
 
     # Resume processing from a specific section
     elif args.resume:
@@ -253,7 +266,7 @@ Examples:
 
         start_from = args.start_from or 1
         print(f"🔄 Resuming processing for section {args.resume}")
-        success = process_section(processor, args.resume, True, start_from, args.resume_method)
+        success = process_section(processor, args.resume, True, start_from, args.resume_method, args.parallel, args.workers)
 
     # Process all sections
     elif args.all:
@@ -267,7 +280,7 @@ Examples:
 
         all_success = True
         for section, count in available_sections:
-            section_success = process_section(processor, section, args.use_resume, 1, args.resume_method)
+            section_success = process_section(processor, section, args.use_resume, 1, args.resume_method, args.parallel, args.workers)
             if not section_success:
                 all_success = False
 
