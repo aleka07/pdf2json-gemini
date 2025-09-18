@@ -280,11 +280,17 @@ Please analyze the uploaded PDF and generate a JSON response following the exact
             logger.error(f"Directory not found: {directory_path}")
             return {"success": False, "error": "Directory not found"}
 
-        # Get all PDF files
-        pdf_files = list(directory.glob("*.pdf"))
+        # Get all PDF files and sort them for consistent ordering
+        pdf_files = sorted(list(directory.glob("*.pdf")), key=lambda x: x.name.lower())
         if not pdf_files:
             logger.warning(f"No PDF files found in {directory_path}")
             return {"success": True, "processed": 0, "failed": 0, "files": []}
+
+        # Log the processing order
+        logger.info("📋 Processing order:")
+        for idx, pdf_file in enumerate(pdf_files, 1):
+            logger.info(f"  {idx:2d}. {pdf_file.name}")
+        logger.info("")
 
         logger.info(f"Found {len(pdf_files)} PDF files to process")
 
@@ -410,11 +416,17 @@ Please analyze the uploaded PDF and generate a JSON response following the exact
             logger.error(f"Directory not found: {directory_path}")
             return {"success": False, "error": "Directory not found"}
 
-        # Get all PDF files
-        pdf_files = sorted(list(directory.glob("*.pdf")))
+        # Get all PDF files and sort them for consistent ordering
+        pdf_files = sorted(list(directory.glob("*.pdf")), key=lambda x: x.name.lower())
         if not pdf_files:
             logger.warning(f"No PDF files found in {directory_path}")
             return {"success": True, "processed": 0, "failed": 0, "files": []}
+
+        # Log the processing order
+        logger.info("📋 Processing order:")
+        for idx, pdf_file in enumerate(pdf_files, 1):
+            logger.info(f"  {idx:2d}. {pdf_file.name}")
+        logger.info("")
 
         # Check already processed files
         already_processed = self.get_already_processed_files(section_code)
@@ -519,11 +531,17 @@ Please analyze the uploaded PDF and generate a JSON response following the exact
 
         logger.info(f"Found {len(processed_files)} already processed files: {sorted(processed_files)}")
 
-        # Get all PDF files
-        pdf_files = sorted(list(directory.glob("*.pdf")))
+        # Get all PDF files and sort them for consistent ordering
+        pdf_files = sorted(list(directory.glob("*.pdf")), key=lambda x: x.name.lower())
         if not pdf_files:
             logger.warning(f"No PDF files found in {directory_path}")
             return {"success": True, "processed": 0, "failed": 0, "files": []}
+
+        # Log the processing order
+        logger.info("📋 Processing order:")
+        for idx, pdf_file in enumerate(pdf_files, 1):
+            logger.info(f"  {idx:2d}. {pdf_file.name}")
+        logger.info("")
 
         logger.info(f"Found {len(pdf_files)} total PDF files")
         logger.info(f"Starting from sequence {start_from}")

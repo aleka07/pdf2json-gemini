@@ -140,12 +140,13 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-    python main.py --section 3.1                           # Process all PDFs in section 3.1
-    python main.py --section 3.1 --use-resume             # Process section 3.1 with smart resume (skip already processed)
-    python main.py --resume 3.1 --start-from 26           # Resume section 3.1 from sequence 26
-    python main.py --all --use-resume                      # Process all sections with smart resume
-    python main.py --file paper.pdf                       # Process a single PDF file
     python main.py --list                                 # List available sections
+    python main.py --list-files 3.1                      # List files in section 3.1 with numbers and status
+    python main.py --section 3.1                         # Process all PDFs in section 3.1
+    python main.py --section 3.1 --use-resume           # Process section 3.1 with smart resume (skip already processed)
+    python main.py --resume 3.1 --start-from 26         # Resume section 3.1 from sequence 26
+    python main.py --all --use-resume                    # Process all sections with smart resume
+    python main.py --file paper.pdf                     # Process a single PDF file
         """
     )
 
@@ -154,6 +155,7 @@ Examples:
     group.add_argument("--all", action="store_true", help="Process all available sections")
     group.add_argument("--file", type=str, help="Process single PDF file")
     group.add_argument("--list", action="store_true", help="List available sections")
+    group.add_argument("--list-files", type=str, help="List files in a specific section with numbers")
     group.add_argument("--resume", type=str, help="Resume processing from a specific section")
 
     parser.add_argument("--sequence-id", type=int, help="Sequence ID for single file processing")
@@ -175,6 +177,45 @@ Examples:
         for section, count in available_sections:
             description = SECTION_DESCRIPTIONS.get(section, "Unknown section")
             print(f"   {section}: {description} ({count} PDFs)")
+
+        return 0
+
+    # List files in specific section
+    if args.list_files:
+        if args.list_files not in SECTION_DESCRIPTIONS:
+            print(f"❌ Unknown section: {args.list_files}")
+            print(f"Available sections: {', '.join(SECTION_DESCRIPTIONS.keys())}")
+            return 1
+
+        directory_path = f"data/input/{args.list_files}"
+        directory = Path(directory_path)
+
+        if not directory.exists():
+            print(f"❌ Section directory not found: {directory_path}")
+            return 1
+
+        pdf_files = sorted(list(directory.glob("*.pdf")), key=lambda x: x.name.lower())
+
+        if not pdf_files:
+            print(f"❌ No PDF files found in section {args.list_files}")
+            return 1
+
+        print(f"📋 Files in section {args.list_files}:")
+        print(f"📁 Directory: {directory_path}")
+        print(f"🔢 Total files: {len(pdf_files)}")
+        print()
+
+        for idx, pdf_file in enumerate(pdf_files, 1):
+            paper_id = f"{args.list_files}-{idx:03d}"
+
+            # Check if already processed
+            output_file = Path(f"data/output/{args.list_files}/{paper_id}.json")
+            status = "✅ Processed" if output_file.exists() else "⏳ Pending"
+
+            print(f"  {idx:2d}. {pdf_file.name}")
+            print(f"      📋 Paper ID: {paper_id}")
+            print(f"      📊 Status: {status}")
+            print()
 
         return 0
 
