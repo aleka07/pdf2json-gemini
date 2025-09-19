@@ -3,11 +3,22 @@
 import os
 import sys
 from pathlib import Path
+from dotenv import load_dotenv
 from pdf_processor import PDFProcessor
 
 def main():
-    # API key from the existing test file
-    API_KEY = "AIzaSyAiGsczDRLUgQirKq0sJ2Zyp2P507pvc90"
+    # Load environment variables from .env file
+    load_dotenv()
+
+    # Get API key from environment variable
+    API_KEY = os.getenv("GEMINI_API_KEY")
+    if not API_KEY:
+        print("❌ Error: GEMINI_API_KEY environment variable not set!")
+        print("💡 Options to fix this:")
+        print("   1. Set environment variable: export GEMINI_API_KEY='your-api-key-here'")
+        print("   2. Create .env file: cp .env.example .env and edit it")
+        print("   3. Get API key from: https://aistudio.google.com/app/apikey")
+        return
 
     # Initialize processor
     processor = PDFProcessor(API_KEY)

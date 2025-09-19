@@ -53,3 +53,154 @@
 2025-09-18 17:08:57,391 - INFO - Uploading PDF: data/input/3.3/2204.09795v2.pdf
 2025-09-18 17:09:02,177 - INFO - PDF uploaded successfully. File ID: files/2w7c0zyf7l7s
 2025-09-18 17:09:02,177 - INFO - Processing PDF with Gemini. File ID: files/2w7c0zyf7l7s
+2025-09-18 17:09:23,928 - INFO - Received response from Gemini
+2025-09-18 17:09:23,928 - INFO - Successfully parsed JSON response
+2025-09-18 17:09:23,929 - INFO - JSON saved to: data/output/3.3/3.3-001.json
+2025-09-18 17:09:23,929 - INFO - Deleting file from Gemini: files/yk0qftw3jrwl
+2025-09-18 17:09:25,208 - INFO - File deleted successfully: files/yk0qftw3jrwl
+2025-09-18 17:09:25,208 - INFO - ✅ [001] Completed: 001163946.pdf
+2025-09-18 17:09:25,209 - INFO - 🔄 [006] Starting: 2208.13982v1 (1).pdf
+2025-09-18 17:09:25,209 - INFO - 📈 Progress: 3/16 (18.8%) - Last completed: 001163946.pdf
+2025-09-18 17:09:25,209 - INFO - Uploading PDF: data/input/3.3/2208.13982v1 (1).pdf
+2025-09-18 17:09:31,604 - INFO - PDF uploaded successfully. File ID: files/hohidr65ckl2
+2025-09-18 17:09:31,605 - INFO - Processing PDF with Gemini. File ID: files/hohidr65ckl2
+2025-09-18 17:09:47,707 - INFO - Received response from Gemini
+2025-09-18 17:09:47,707 - INFO - Successfully parsed JSON response
+2025-09-18 17:09:47,708 - INFO - JSON saved to: data/output/3.3/3.3-004.json
+2025-09-18 17:09:47,708 - INFO - Deleting file from Gemini: files/kilol4pvyxxy
+2025-09-18 17:09:49,115 - INFO - File deleted successfully: files/kilol4pvyxxy
+2025-09-18 17:09:49,115 - INFO - ✅ [004] Completed: 1808.02515v1.pdf
+2025-09-18 17:09:49,116 - INFO - 🔄 [007] Starting: 2208.13982v1.pdf
+2025-09-18 17:09:49,116 - INFO - 📈 Progress: 4/16 (25.0%) - Last completed: 1808.02515v1.pdf
+2025-09-18 17:09:49,116 - INFO - Uploading PDF: data/input/3.3/2208.13982v1.pdf
+2025-09-18 17:09:50,745 - INFO - Received response from Gemini
+2025-09-18 17:09:50,746 - INFO - Successfully parsed JSON response
+2025-09-18 17:09:50,754 - INFO - JSON saved to: data/output/3.3/3.3-005.json
+2025-09-18 17:09:50,755 - INFO - Deleting file from Gemini: files/2w7c0zyf7l7s
+2025-09-18 17:09:52,188 - INFO - File deleted successfully: files/2w7c0zyf7l7s
+2025-09-18 17:09:52,188 - INFO - ✅ [005] Completed: 2204.09795v2.pdf
+2025-09-18 17:09:52,189 - INFO - 🔄 [008] Starting: 2501.14890v1.pdf
+2025-09-18 17:09:52,189 - INFO - 📈 Progress: 5/16 (31.2%) - Last completed: 2204.09795v2.pdf
+2025-09-18 17:09:52,189 - INFO - Uploading PDF: data/input/3.3/2501.14890v1.pdf
+2025-09-18 17:09:53,419 - INFO - PDF uploaded successfully. File ID: files/rs45zseyvsiq
+2025-09-18 17:09:53,419 - INFO - Processing PDF with Gemini. File ID: files/rs45zseyvsiq
+2025-09-18 17:09:56,343 - INFO - PDF uploaded successfully. File ID: files/g2dbproiltnz
+2025-09-18 17:09:56,343 - INFO - Processing PDF with Gemini. File ID: files/g2dbproiltnz
+2025-09-18 17:10:08,087 - INFO - Received response from Gemini
+2025-09-18 17:10:08,087 - INFO - Successfully parsed JSON response
+2025-09-18 17:10:08,088 - INFO - JSON saved to: data/output/3.3/3.3-006.json
+2025-09-18 17:10:08,088 - INFO - Deleting file from Gemini: files/hohidr65ckl2
+2025-09-18 17:10:09,566 - INFO - File deleted successfully: files/hohidr65ckl2
+2025-09-18 17:10:09,566 - INFO - ✅ [006] Completed: 2208.13982v1 (1).pdf
+2025-09-18 17:10:09,566 - INFO - 🔄 [009] Starting: 570104.pdf
+2025-09-18 17:10:09,566 - INFO - 📈 Progress: 6/16 (37.5%) - Last completed: 2208.13982v1 (1).pdf
+2025-09-18 17:10:09,566 - INFO - Uploading PDF: data/input/3.3/570104.pdf
+2025-09-18 17:10:17,630 - INFO - PDF uploaded successfully. File ID: files/4xo0d4oy5urn
+2025-09-18 17:10:17,630 - INFO - Processing PDF with Gemini. File ID: files/4xo0d4oy5urn
+2025-09-18 17:10:29,724 - INFO - Received response from Gemini
+2025-09-18 17:10:29,725 - INFO - Successfully parsed JSON response
+2025-09-18 17:10:29,726 - INFO - JSON saved to: data/output/3.3/3.3-007.json
+2025-09-18 17:10:29,726 - INFO - Deleting file from Gemini: files/rs45zseyvsiq
+2025-09-18 17:10:31,069 - INFO - File deleted successfully: files/rs45zseyvsiq
+2025-09-18 17:10:31,070 - INFO - ✅ [007] Completed: 2208.13982v1.pdf
+2025-09-18 17:10:31,070 - INFO - 🔄 [010] Starting: 978-3-031-19433-7_46.pdf
+2025-09-18 17:10:31,070 - INFO - 📈 Progress: 7/16 (43.8%) - Last completed: 2208.13982v1.pdf
+2025-09-18 17:10:31,071 - INFO - Uploading PDF: data/input/3.3/978-3-031-19433-7_46.pdf
+2025-09-18 17:10:35,653 - INFO - PDF uploaded successfully. File ID: files/ks3odtfbl6wp
+2025-09-18 17:10:35,653 - INFO - Processing PDF with Gemini. File ID: files/ks3odtfbl6wp
+2025-09-18 17:10:41,212 - INFO - Received response from Gemini
+2025-09-18 17:10:41,212 - INFO - Successfully parsed JSON response
+2025-09-18 17:10:41,214 - INFO - JSON saved to: data/output/3.3/3.3-008.json
+2025-09-18 17:10:41,214 - INFO - Deleting file from Gemini: files/g2dbproiltnz
+2025-09-18 17:10:42,311 - INFO - File deleted successfully: files/g2dbproiltnz
+2025-09-18 17:10:42,312 - INFO - ✅ [008] Completed: 2501.14890v1.pdf
+2025-09-18 17:10:42,312 - INFO - 🔄 [011] Starting: applsci-13-02515-v2.pdf
+2025-09-18 17:10:42,313 - INFO - 📈 Progress: 8/16 (50.0%) - Last completed: 2501.14890v1.pdf
+2025-09-18 17:10:42,313 - INFO - Uploading PDF: data/input/3.3/applsci-13-02515-v2.pdf
+2025-09-18 17:10:46,908 - INFO - PDF uploaded successfully. File ID: files/3n4j7jnjx0pr
+2025-09-18 17:10:46,908 - INFO - Processing PDF with Gemini. File ID: files/3n4j7jnjx0pr
+2025-09-18 17:11:11,171 - INFO - Received response from Gemini
+2025-09-18 17:11:11,172 - INFO - Successfully parsed JSON response
+2025-09-18 17:11:11,174 - INFO - JSON saved to: data/output/3.3/3.3-010.json
+2025-09-18 17:11:11,174 - INFO - Deleting file from Gemini: files/ks3odtfbl6wp
+2025-09-18 17:11:12,666 - INFO - File deleted successfully: files/ks3odtfbl6wp
+2025-09-18 17:11:12,667 - INFO - ✅ [010] Completed: 978-3-031-19433-7_46.pdf
+2025-09-18 17:11:12,667 - INFO - 🔄 [012] Starting: sensors-25-02945.pdf
+2025-09-18 17:11:12,667 - INFO - 📈 Progress: 9/16 (56.2%) - Last completed: 978-3-031-19433-7_46.pdf
+2025-09-18 17:11:12,668 - INFO - Uploading PDF: data/input/3.3/sensors-25-02945.pdf
+2025-09-18 17:11:19,077 - INFO - Received response from Gemini
+2025-09-18 17:11:19,077 - INFO - Successfully parsed JSON response
+2025-09-18 17:11:19,080 - INFO - JSON saved to: data/output/3.3/3.3-009.json
+2025-09-18 17:11:19,080 - INFO - Deleting file from Gemini: files/4xo0d4oy5urn
+2025-09-18 17:11:20,183 - INFO - File deleted successfully: files/4xo0d4oy5urn
+2025-09-18 17:11:20,183 - INFO - ✅ [009] Completed: 570104.pdf
+2025-09-18 17:11:20,184 - INFO - 🔄 [013] Starting: The_digital_thread_for_system_lifecycle_management (1).pdf
+2025-09-18 17:11:20,184 - INFO - 📈 Progress: 10/16 (62.5%) - Last completed: 570104.pdf
+2025-09-18 17:11:20,184 - INFO - Uploading PDF: data/input/3.3/The_digital_thread_for_system_lifecycle_management (1).pdf
+2025-09-18 17:11:20,189 - INFO - Received response from Gemini
+2025-09-18 17:11:20,189 - INFO - Successfully parsed JSON response
+2025-09-18 17:11:20,191 - INFO - JSON saved to: data/output/3.3/3.3-011.json
+2025-09-18 17:11:20,191 - INFO - Deleting file from Gemini: files/3n4j7jnjx0pr
+2025-09-18 17:11:21,301 - INFO - File deleted successfully: files/3n4j7jnjx0pr
+2025-09-18 17:11:21,302 - INFO - ✅ [011] Completed: applsci-13-02515-v2.pdf
+2025-09-18 17:11:21,302 - INFO - 🔄 [014] Starting: The_digital_thread_for_system_lifecycle_management.pdf
+2025-09-18 17:11:21,302 - INFO - 📈 Progress: 11/16 (68.8%) - Last completed: applsci-13-02515-v2.pdf
+2025-09-18 17:11:21,303 - INFO - Uploading PDF: data/input/3.3/The_digital_thread_for_system_lifecycle_management.pdf
+2025-09-18 17:11:28,583 - INFO - PDF uploaded successfully. File ID: files/evlr0yxqxfra
+2025-09-18 17:11:28,583 - INFO - Processing PDF with Gemini. File ID: files/evlr0yxqxfra
+2025-09-18 17:11:31,657 - INFO - PDF uploaded successfully. File ID: files/ptsva6redt9k
+2025-09-18 17:11:31,657 - INFO - Processing PDF with Gemini. File ID: files/ptsva6redt9k
+2025-09-18 17:11:34,499 - INFO - PDF uploaded successfully. File ID: files/nb6mj1woerwi
+2025-09-18 17:11:34,500 - INFO - Processing PDF with Gemini. File ID: files/nb6mj1woerwi
+2025-09-18 17:12:03,906 - INFO - Received response from Gemini
+2025-09-18 17:12:03,907 - INFO - Successfully parsed JSON response
+2025-09-18 17:12:03,908 - INFO - JSON saved to: data/output/3.3/3.3-012.json
+2025-09-18 17:12:03,908 - INFO - Deleting file from Gemini: files/ptsva6redt9k
+2025-09-18 17:12:05,519 - INFO - Received response from Gemini
+2025-09-18 17:12:05,519 - INFO - Successfully parsed JSON response
+2025-09-18 17:12:05,519 - INFO - JSON saved to: data/output/3.3/3.3-014.json
+2025-09-18 17:12:05,519 - INFO - Deleting file from Gemini: files/evlr0yxqxfra
+2025-09-18 17:12:05,667 - INFO - File deleted successfully: files/ptsva6redt9k
+2025-09-18 17:12:05,667 - INFO - ✅ [012] Completed: sensors-25-02945.pdf
+2025-09-18 17:12:05,667 - INFO - 🔄 [015] Starting: Timescale_WhitePaper_Benchmarking_Influx.pdf
+2025-09-18 17:12:05,667 - INFO - 📈 Progress: 12/16 (75.0%) - Last completed: sensors-25-02945.pdf
+2025-09-18 17:12:05,667 - INFO - Uploading PDF: data/input/3.3/Timescale_WhitePaper_Benchmarking_Influx.pdf
+2025-09-18 17:12:07,007 - INFO - File deleted successfully: files/evlr0yxqxfra
+2025-09-18 17:12:07,007 - INFO - ✅ [014] Completed: The_digital_thread_for_system_lifecycle_management.pdf
+2025-09-18 17:12:07,007 - INFO - 🔄 [016] Starting: Wireless Communications and Mobile Computing - 2023 - de Oliveira - Time Series Compression for IoT  A Systematic.pdf
+2025-09-18 17:12:07,007 - INFO - 📈 Progress: 13/16 (81.2%) - Last completed: The_digital_thread_for_system_lifecycle_management.pdf
+2025-09-18 17:12:07,008 - INFO - Uploading PDF: data/input/3.3/Wireless Communications and Mobile Computing - 2023 - de Oliveira - Time Series Compression for IoT  A Systematic.pdf
+2025-09-18 17:12:08,988 - INFO - Received response from Gemini
+2025-09-18 17:12:08,989 - INFO - Successfully parsed JSON response
+2025-09-18 17:12:08,990 - INFO - JSON saved to: data/output/3.3/3.3-013.json
+2025-09-18 17:12:08,990 - INFO - Deleting file from Gemini: files/nb6mj1woerwi
+2025-09-18 17:12:10,005 - INFO - File deleted successfully: files/nb6mj1woerwi
+2025-09-18 17:12:10,005 - INFO - ✅ [013] Completed: The_digital_thread_for_system_lifecycle_management (1).pdf
+2025-09-18 17:12:10,005 - INFO - 📈 Progress: 14/16 (87.5%) - Last completed: The_digital_thread_for_system_lifecycle_management (1).pdf
+2025-09-18 17:12:10,952 - INFO - PDF uploaded successfully. File ID: files/uhcor8dxqxff
+2025-09-18 17:12:10,952 - INFO - Processing PDF with Gemini. File ID: files/uhcor8dxqxff
+2025-09-18 17:12:12,625 - INFO - PDF uploaded successfully. File ID: files/s021gwpan32q
+2025-09-18 17:12:12,626 - INFO - Processing PDF with Gemini. File ID: files/s021gwpan32q
+2025-09-18 17:12:45,394 - INFO - Received response from Gemini
+2025-09-18 17:12:45,395 - INFO - Successfully parsed JSON response
+2025-09-18 17:12:45,397 - INFO - JSON saved to: data/output/3.3/3.3-015.json
+2025-09-18 17:12:45,397 - INFO - Deleting file from Gemini: files/uhcor8dxqxff
+2025-09-18 17:12:47,271 - INFO - File deleted successfully: files/uhcor8dxqxff
+2025-09-18 17:12:47,272 - INFO - ✅ [015] Completed: Timescale_WhitePaper_Benchmarking_Influx.pdf
+2025-09-18 17:12:47,272 - INFO - 📈 Progress: 15/16 (93.8%) - Last completed: Timescale_WhitePaper_Benchmarking_Influx.pdf
+2025-09-18 17:13:01,602 - INFO - Received response from Gemini
+2025-09-18 17:13:01,602 - INFO - Successfully parsed JSON response
+2025-09-18 17:13:01,604 - INFO - JSON saved to: data/output/3.3/3.3-016.json
+2025-09-18 17:13:01,604 - INFO - Deleting file from Gemini: files/s021gwpan32q
+2025-09-18 17:13:02,800 - INFO - File deleted successfully: files/s021gwpan32q
+2025-09-18 17:13:02,800 - INFO - ✅ [016] Completed: Wireless Communications and Mobile Computing - 2023 - de Oliveira - Time Series Compression for IoT  A Systematic.pdf
+2025-09-18 17:13:02,800 - INFO - 📈 Progress: 16/16 (100.0%) - Last completed: Wireless Communications and Mobile Computing - 2023 - de Oliveira - Time Series Compression for IoT  A Systematic.pdf
+2025-09-18 17:13:02,800 - INFO - 
+        🎉 Parallel Processing Complete:
+        - Total files: 16
+        - Successfully processed: 16
+        - Failed: 0
+        - Success rate: 100.0%
+        - Workers used: 3
+        
+2025-09-18 17:13:02,801 - INFO - Processing summary saved to: logs/summaries/summary_3.3_20250918_171302.json

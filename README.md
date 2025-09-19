@@ -5,10 +5,13 @@ This project processes scientific PDF papers using Google's Gemini API to genera
 ## Quick Start
 
 ```bash
-# Activate environment
+# 1. Set up API key
+export GEMINI_API_KEY='your-api-key-here'
+
+# 2. Activate environment
 source .venv/bin/activate
 
-# List available sections
+# 3. List available sections
 python main.py --list
 
 # Process a specific section
@@ -96,15 +99,44 @@ This research focuses on an industrial Digital Twin system:
 - ✅ **Error Handling**: Robust error handling prevents single failures from stopping process
 - ✅ **Progress Reporting**: Real-time status and completion statistics
 
-## Dependencies
+## Setup
 
+### 1. API Key Configuration
+
+**Option 1: Environment Variable**
+```bash
+export GEMINI_API_KEY='your-actual-api-key-here'
+```
+
+**Option 2: .env File (Recommended)**
+```bash
+# Copy example file
+cp .env.example .env
+
+# Edit .env and add your API key:
+# GEMINI_API_KEY=your-actual-api-key-here
+```
+
+**Get API Key:**
+- Visit: https://aistudio.google.com/app/apikey
+- Create new API key
+- Copy and use in your configuration
+
+### 2. Dependencies
 - **Python 3.12**
 - **google-generativeai**: Main package for Gemini API integration
+- **python-dotenv**: For .env file support
 - **Virtual environment**: Pre-configured in `.venv/`
 
-## Notes
+## Performance
 
-- API key currently hardcoded for development (should be moved to environment variable for production)
-- Each PDF takes ~30-45 seconds to process due to Gemini API processing time
-- Files are automatically deleted from Gemini cloud storage after processing
+- **Sequential mode**: ~45 seconds per PDF
+- **Parallel mode** (recommended): ~15 seconds per PDF with 3 workers
+- **Max speed**: Use `--parallel --workers 5` for fastest processing
+
+## Security Notes
+
+- ✅ API key now uses environment variables (secure)
+- ✅ Files automatically deleted from Gemini cloud storage after processing
+- ✅ No sensitive data committed to repository
 - JSON output includes relevance scoring and direct applicability analysis for the Digital Twin project
