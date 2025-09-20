@@ -60,6 +60,16 @@ SECTION_DESCRIPTIONS = {
     "6.5": "Оптимизация производительности."
 }
 
+def get_section_description(section_code: str) -> str:
+    """Return a human-readable description for built-in or custom sections."""
+    if section_code in SECTION_DESCRIPTIONS:
+        return SECTION_DESCRIPTIONS[section_code]
+    return "Custom section directory"
+
+def get_section_input_dir(section_code: str) -> Path:
+    """Return the input directory path for the given section code."""
+    return Path("data/input") / section_code
+
 def find_available_sections():
     """Find all available section directories."""
     input_dir = Path("data/input")
@@ -67,24 +77,26 @@ def find_available_sections():
         return []
 
     sections = []
-    for item in input_dir.iterdir():
-        if item.is_dir() and item.name in SECTION_DESCRIPTIONS:
-            # Check if directory has PDF files
-            pdf_files = list(item.glob("*.pdf"))
-            if pdf_files:
-                sections.append((item.name, len(pdf_files)))
+    for item in sorted(input_dir.iterdir(), key=lambda x: x.name.lower()):
+        if not item.is_dir():
+            continue
 
-    return sorted(sections)
+        # Check if directory has PDF files
+        pdf_files = list(item.glob("*.pdf"))
+        if pdf_files:
+            sections.append((item.name, len(pdf_files)))
+
+    return sections
 
 def process_section(processor, section_code, use_resume=False, start_from=1, resume_method="smart", parallel=False, workers=3):
     """Process all PDFs in a specific section."""
-    directory_path = f"data/input/{section_code}"
+    directory_path = str(get_section_input_dir(section_code))
 
     if not Path(directory_path).exists():
         print(f"❌ Section directory not found: {directory_path}")
         return False
 
-    print(f"\n🔄 Processing Section {section_code}: {SECTION_DESCRIPTIONS.get(section_code, 'Unknown section')}")
+    print(f"\n🔄 Processing Section {section_code}: {get_section_description(section_code)}")
     print(f"📁 Directory: {directory_path}")
 
     if parallel:
@@ -138,12 +150,21 @@ def process_single_file(processor, file_path, section_code=None, sequence_id=Non
 
     # Auto-detect section if not provided
     if section_code is None:
-        # Try to extract from path (e.g., data/input/3.1/file.pdf)
-        path_parts = file_path.parts
-        for part in path_parts:
-            if part in SECTION_DESCRIPTIONS:
-                section_code = part
-                break
+        try:
+            relative = file_path.relative_to(Path("data/input"))
+            if relative.parts:
+                candidate = relative.parts[0]
+                if get_section_input_dir(candidate).exists():
+                    section_code = candidate
+        except ValueError:
+            pass
+
+        if section_code is None:
+            # Fall back to scanning path parts for a matching input directory
+            for part in file_path.parts:
+                if get_section_input_dir(part).exists():
+                    section_code = part
+                    break
 
         if section_code is None:
             section_code = "misc"  # Default section
@@ -213,23 +234,22 @@ Examples:
 
         print("📋 Available sections:")
         for section, count in available_sections:
-            description = SECTION_DESCRIPTIONS.get(section, "Unknown section")
+            description = get_section_description(section)
             print(f"   {section}: {description} ({count} PDFs)")
 
         return 0
 
     # List files in specific section
     if args.list_files:
-        if args.list_files not in SECTION_DESCRIPTIONS:
-            print(f"❌ Unknown section: {args.list_files}")
-            print(f"Available sections: {', '.join(SECTION_DESCRIPTIONS.keys())}")
-            return 1
-
-        directory_path = f"data/input/{args.list_files}"
-        directory = Path(directory_path)
+        directory = get_section_input_dir(args.list_files)
+        directory_path = str(directory)
 
         if not directory.exists():
             print(f"❌ Section directory not found: {directory_path}")
+            available_sections = find_available_sections()
+            if available_sections:
+                print("📋 Available sections:")
+                print(", ".join(section for section, _ in available_sections))
             return 1
 
         pdf_files = sorted(list(directory.glob("*.pdf")), key=lambda x: x.name.lower())
@@ -274,21 +294,11 @@ Examples:
 
     # Process specific section
     elif args.section:
-        if args.section not in SECTION_DESCRIPTIONS:
-            print(f"❌ Unknown section: {args.section}")
-            print(f"Available sections: {', '.join(SECTION_DESCRIPTIONS.keys())}")
-            return 1
-
         start_from = args.start_from or 1
         success = process_section(processor, args.section, args.use_resume, start_from, args.resume_method, args.parallel, args.workers)
 
     # Resume processing from a specific section
     elif args.resume:
-        if args.resume not in SECTION_DESCRIPTIONS:
-            print(f"❌ Unknown section: {args.resume}")
-            print(f"Available sections: {', '.join(SECTION_DESCRIPTIONS.keys())}")
-            return 1
-
         start_from = args.start_from or 1
         print(f"🔄 Resuming processing for section {args.resume}")
         success = process_section(processor, args.resume, True, start_from, args.resume_method, args.parallel, args.workers)
