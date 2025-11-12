@@ -2,8 +2,8 @@
 
 **MY WORKFLOW:**
 In each message, I will provide you with three pieces of information:
-1.  **Section Code:** The code of my project's calendar plan section (e.g., `3.1`, `4.2`).
-2.  **Sequence ID:** A sequential number for the paper within that section (e.g., `1`, `5`, `34`).
+1.  **Category Code:** An identifier for organizing papers (e.g., `ML`, `IoT`, `security`, or any custom category).
+2.  **Sequence ID:** A sequential number for the paper within that category (e.g., `1`, `5`, `34`).
 3.  **Paper Content:** The full text of the scientific paper, either pasted directly or as an uploaded file (e.g., PDF) that you must read.
 
 Your task is to use these three inputs to analyze the paper and generate a single JSON object as a response.
@@ -11,43 +11,9 @@ Your task is to use these three inputs to analyze the paper and generate a singl
 **YOUR RESPONSE REQUIREMENTS:**
 1.  Your output **MUST** be a single, valid JSON object.
 2.  Do **NOT** include any text, greetings, explanations, or markdown formatting (like ` ```json `) before or after the JSON block. Your entire response must be the raw JSON content.
-3.  You will construct the `paper_id` field in the JSON by combining the **Section Code** and the **Sequence ID**. The ID should be zero-padded to 3 digits for consistent sorting.
-    *   **Example:** If I provide `Section: 3.1` and `ID: 5`, you will generate `"paper_id": "3.1-005"`.
-    *   **Example:** If I provide `Section: 4.2` and `ID: 34`, you will generate `"paper_id": "4.2-034"`.
-4.  Use the `PROJECT CONTEXT` and `PROJECT PLAN SECTIONS` provided below to inform your analysis, especially for the `"relevance_to_my_project"` section of the JSON.
-
----
-**PROJECT CONTEXT (For your reference):**
-My project is a Digital Twin for an industrial enterprise.
-*   **Data Source:** Saiman brand industrial meters in Kazakhstan.
-*   **Edge Hardware:** ESP32 microcontrollers connected to meters.
-*   **Edge Gateway:** Raspberry Pi 5.
-*   **Communication:** MQTT over Wi-Fi from ESP32 to Gateway.
-*   **Cloud Architecture:** Mosquitto (MQTT Broker) -> Telegraf -> InfluxDB (Time-Series Database).
-*   **Ultimate Goal:** Use the data for Machine Learning (anomaly detection, process optimization, prediction).
-
----
-**PROJECT PLAN SECTIONS (For your reference):**
-*   `2.3`: Проведение симуляций работы предприятия в различных сценариях.
-*   `2.4`: Оптимизация процессов на основе результатов симуляций.
-*   `2.5`: Интеграция принципов бережливого производства.
-*   `3.1`: Определение требований к системе сбора данных.
-*   `3.2`: Проведение экспериментальных работ по интеграции датчиков и устройств IIoT.
-*   `3.3`: Разработка инфраструктуры для хранения данных.
-*   `4.1`: Сбор и подготовка данных.
-*   `4.2`: Разработка алгоритмов машинного обучения.
-*   `4.3`: Валидация и тестирование моделей, различных сценариев.
-*   `4.4`: Анализ и выявление паттернов, обнаружение аномалий.
-*   `4.5`: Оптимизация производственных процессов и прогнозирование будущих событий.
-*   `5.1`: Анализ существующих систем управления.
-*   `5.2`: Интеграция 3D моделей промышленных объектов.
-*   `5.3`: Разработка математических моделей оптимизации.
-*   `5.4`: Интеграция киберфизической системы и тестирование.
-*   `6.1`: Определение требований к интерфейсу.
-*   `6.2`: Разработка прототипов интерфейса.
-*   `6.3`: Разработка пользовательского интерфейса и интеграция с системой цифрового двойника.
-*   `6.4`: Тестирование и отладка интерфейса.
-*   `6.5`: Оптимизация производительности.
+3.  You will construct the `paper_id` field in the JSON by combining the **Category Code** and the **Sequence ID**. The ID should be zero-padded to 3 digits for consistent sorting.
+    *   **Example:** If I provide `Category: ML` and `ID: 5`, you will generate `"paper_id": "ML-005"`.
+    *   **Example:** If I provide `Category: security` and `ID: 34`, you will generate `"paper_id": "security-034"`.
 
 ---
 **JSON SCHEMA TO GENERATE:**
@@ -55,10 +21,6 @@ My project is a Digital Twin for an industrial enterprise.
 ```json
 {
   "paper_id": "...",
-  "project_context": {
-    "section_code": "...",
-    "section_description": "..."
-  },
   "metadata": {
     "title": "...",
     "authors": ["...", "..."],
@@ -82,11 +44,6 @@ My project is a Digital Twin for an industrial enterprise.
       "Finding 2"
     ],
     "evaluation_metrics": ["List of metrics used to validate the results (e.g., 'Latency (ms)', 'Throughput (msg/s)', 'Model Accuracy (%)', 'Data Loss Rate')."]
-  },
-  "relevance_to_my_project": {
-    "direct_applicability": "How can the methods or findings from this paper be directly applied to my specific project stack or goals? Be specific.",
-    "relevance_score": "On a scale of 1 (low) to 5 (high), how relevant is this paper to the specified Section Code and my overall project?",
-    "cited_ideas": ["List specific ideas, concepts, or warnings from this paper that are worth citing in my report for this section."]
   },
   "keywords": ["List of 5-7 most important keywords from the paper."]
 }

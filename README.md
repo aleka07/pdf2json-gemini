@@ -1,6 +1,8 @@
-# Digital Twin PDF Processing Project
+# PDF to JSON Processing Tool
 
-This project processes scientific PDF papers using Google's Gemini API to generate structured JSON data for Digital Twin research analysis.
+A universal tool for processing scientific PDF papers using Google's Gemini API to generate structured JSON data.
+
+> 📚 **New user?** Start with **[GETTING_STARTED.md](GETTING_STARTED.md)** for a step-by-step guide!
 
 ## Quick Start
 
@@ -8,33 +10,35 @@ This project processes scientific PDF papers using Google's Gemini API to genera
 # 1. Set up API key
 export GEMINI_API_KEY='your-api-key-here'
 
-# 2. Activate environment
+# 2. Activate environment (if using virtual environment)
 source .venv/bin/activate
 
-# 3. List available sections
+# 3. List available categories
 python main.py --list
 
-# Process a specific section
-python main.py --section 3.1
+# Process a specific category
+python main.py --category ML
 
 # Process a single file
 python main.py --file path/to/paper.pdf
 
-# Process all sections
+# Process all categories
 python main.py --all
 ```
 
 ## Project Structure
 
 ```
-dt-report-2025/
+pdf2json-gemini/
 ├── data/
 │   ├── input/
-│   │   ├── 3.1/           # PDF papers for section 3.1
-│   │   └── 3.2/           # PDF papers for section 3.2
+│   │   ├── ML/            # PDF papers for Machine Learning category
+│   │   ├── IoT/           # PDF papers for IoT category
+│   │   └── security/      # PDF papers for Security category
 │   └── output/
-│       ├── 3.1/           # Generated JSON files for section 3.1
-│       └── 3.2/           # Generated JSON files for section 3.2
+│       ├── ML/            # Generated JSON files for ML category
+│       ├── IoT/           # Generated JSON files for IoT category
+│       └── security/      # Generated JSON files for Security category
 ├── main.py                # Main orchestration script
 ├── pdf_processor.py       # Core PDF processing class
 ├── test_single_pdf.py     # Single file testing script
@@ -53,51 +57,57 @@ dt-report-2025/
 
 ### 2. Main Script (`main.py`)
 - Command-line interface for all operations
-- Supports processing single files, sections, or all sections
+- Supports processing single files, categories, or all categories
 - Comprehensive logging and progress reporting
-- Automatic section detection from file paths
+- Automatic category detection from file paths
 
 ### 3. JSON Schema (`prompt.md`)
 Each generated JSON includes:
-- `paper_id`: Format "section-sequence" (e.g., "3.1-001")
-- `project_context`: Section code and Russian description
+- `paper_id`: Format "category-sequence" (e.g., "ML-001", "IoT-005")
 - `metadata`: Title, authors, year, venue, DOI
 - `summary`: Problem statement, objective, key contribution
 - `methodology`: Approach type, technologies, method summary
 - `results_and_evaluation`: Key findings and evaluation metrics
-- `relevance_to_my_project`: Direct applicability, relevance score (1-5), cited ideas
 - `keywords`: 5-7 most important keywords
 
-## Project Sections
+## How to Organize Your Papers
 
-- **3.1**: Определение требований к системе сбора данных
-- **3.2**: Проведение экспериментальных работ по интеграции датчиков и устройств IIoT
-- **3.3**: Разработка инфраструктуры для хранения данных
-- **4.1**: Сбор и подготовка данных
-- **4.2**: Разработка алгоритмов машинного обучения
-- **4.3**: Валидация и тестирование моделей, различных сценариев
-- **4.4**: Анализ и выявление паттернов, обнаружение аномалий
-- **4.5**: Оптимизация производственных процессов и прогнозирование будущих событий
+Create subdirectories under `data/input/` for different categories:
 
-## Digital Twin Context
+```bash
+mkdir -p data/input/ML        # Machine Learning papers
+mkdir -p data/input/IoT       # IoT papers
+mkdir -p data/input/security  # Security papers
+mkdir -p data/input/blockchain # Blockchain papers
+# ... or any category name you want
+```
 
-This research focuses on an industrial Digital Twin system:
-- **Hardware**: Saiman brand meters in Kazakhstan
-- **Edge**: ESP32 microcontrollers → Raspberry Pi 5 gateway
-- **Communication**: MQTT over Wi-Fi
-- **Cloud Stack**: Mosquitto (MQTT) → Telegraf → InfluxDB
-- **Goal**: Machine Learning for anomaly detection, process optimization, prediction
+Place your PDF files in the appropriate category folders. The tool will automatically:
+- Detect all categories with PDF files
+- Generate sequential IDs for papers in each category
+- Create corresponding output folders with JSON files
 
 ## Features
 
+- ✅ **Universal & Flexible**: Works with any research domain or topic
 - ✅ **Individual Processing**: Each PDF processed separately with own API request
 - ✅ **Automatic Cleanup**: Files deleted from cloud immediately after processing
-- ✅ **Sequential Processing**: One PDF at a time to avoid API overload
-- ✅ **Structured Output**: JSON files follow exact schema requirements
-- ✅ **Section Organization**: Output mirrors input directory structure
+- ✅ **Parallel Processing**: Process multiple PDFs simultaneously for speed
+- ✅ **Structured Output**: JSON files follow customizable schema
+- ✅ **Category Organization**: Flexible folder-based organization
 - ✅ **Comprehensive Logging**: Full audit trail of all operations
 - ✅ **Error Handling**: Robust error handling prevents single failures from stopping process
 - ✅ **Progress Reporting**: Real-time status and completion statistics
+- ✅ **Resume Capability**: Continue interrupted processing from where you left off
+
+## Documentation
+
+- **[GETTING_STARTED.md](GETTING_STARTED.md)** - 🚀 Start here! Quick setup guide for new users
+- **[USAGE.md](USAGE.md)** - Comprehensive usage guide with examples
+- **[EXPORT_GUIDE.md](EXPORT_GUIDE.md)** - 📊 How to merge JSON and export to CSV
+- **[QUICK_REFERENCE.md](QUICK_REFERENCE.md)** - Quick command reference
+- **[MIGRATION.md](MIGRATION.md)** - Details about changes from previous version
+- **[prompt.md](prompt.md)** - JSON schema and AI instructions (customizable)
 
 ## Setup
 
@@ -134,9 +144,47 @@ cp .env.example .env
 - **Parallel mode** (recommended): ~15 seconds per PDF with 3 workers
 - **Max speed**: Use `--parallel --workers 5` for fastest processing
 
+## Command Examples
+
+### Processing PDFs
+```bash
+# List all available categories
+python main.py --list
+
+# Process all categories in parallel (fastest)
+python main.py --all --parallel
+
+# Process specific category
+python main.py --category paper1 --parallel
+```
+
+### Exporting Results
+```bash
+# Merge JSON files (optional)
+python merge_json_outputs.py
+
+# Export all to CSV
+python export_to_csv.py
+
+# Export specific category
+python export_to_csv.py --category paper1 --output results.csv
+```
+
+### Complete Workflow
+```bash
+# 1. Process PDFs
+python main.py --all --parallel
+
+# 2. Merge results (optional)
+python merge_json_outputs.py
+
+# 3. Export to CSV
+python export_to_csv.py --output final_results.csv
+```
+
 ## Security Notes
 
-- ✅ API key now uses environment variables (secure)
+- ✅ API key uses environment variables (secure)
 - ✅ Files automatically deleted from Gemini cloud storage after processing
 - ✅ No sensitive data committed to repository
-- JSON output includes relevance scoring and direct applicability analysis for the Digital Twin project
+- ✅ Generic schema - adaptable to any research domain

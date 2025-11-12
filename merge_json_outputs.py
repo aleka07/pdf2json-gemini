@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-"""Merge generated JSON outputs into a single file per section directory.
+"""Merge generated JSON outputs into a single file per category directory.
 
 Usage:
     python merge_json_outputs.py                  # merge under data/output
     python merge_json_outputs.py --root other_dir # custom root directory
 
-Each immediate subdirectory under the root is treated as a section directory.
-All JSON files within a section are loaded and combined into a single list that
-is written back to `<section>/<section>_merged.json`.
+Each immediate subdirectory under the root is treated as a category directory.
+All JSON files within a category are loaded and combined into a single list that
+is written back to `<category>/<category>_merged.json`.
 """
 
 import argparse
@@ -17,19 +17,19 @@ from pathlib import Path
 from typing import List
 
 
-def collect_json_files(section_dir: Path) -> List[Path]:
-    """Return JSON files in the section directory sorted by name."""
+def collect_json_files(category_dir: Path) -> List[Path]:
+    """Return JSON files in the category directory sorted by name."""
     files = [
         path
-        for path in section_dir.glob("*.json")
+        for path in category_dir.glob("*.json")
         if path.is_file() and not path.name.endswith("_merged.json")
     ]
     return sorted(files, key=lambda p: p.name.lower())
 
 
-def merge_section(section_dir: Path) -> Path:
-    """Merge all JSON files in a section directory into a single file."""
-    json_files = collect_json_files(section_dir)
+def merge_category(category_dir: Path) -> Path:
+    """Merge all JSON files in a category directory into a single file."""
+    json_files = collect_json_files(category_dir)
     if not json_files:
         return None
 
@@ -42,7 +42,7 @@ def merge_section(section_dir: Path) -> Path:
         except json.JSONDecodeError as exc:
             raise ValueError(f"Failed to parse {json_file}: {exc}") from exc
 
-    output_path = section_dir / f"{section_dir.name}_merged.json"
+    output_path = category_dir / f"{category_dir.name}_merged.json"
     with output_path.open("w", encoding="utf-8") as handle:
         json.dump(merged_data, handle, ensure_ascii=False, indent=2)
 
@@ -50,35 +50,35 @@ def merge_section(section_dir: Path) -> Path:
 
 
 def merge_outputs(root: Path) -> int:
-    """Merge JSON outputs for every section found under the root directory."""
+    """Merge JSON outputs for every category found under the root directory."""
     if not root.exists() or not root.is_dir():
         print(f"❌ Root directory not found: {root}")
         return 1
 
-    section_dirs = [d for d in sorted(root.iterdir()) if d.is_dir()]
-    if not section_dirs:
-        print(f"❌ No section directories found under {root}")
+    category_dirs = [d for d in sorted(root.iterdir()) if d.is_dir()]
+    if not category_dirs:
+        print(f"❌ No category directories found under {root}")
         return 1
 
     merged_any = False
-    for section_dir in section_dirs:
+    for category_dir in category_dirs:
         try:
-            merged_file = merge_section(section_dir)
+            merged_file = merge_category(category_dir)
         except ValueError as error:
             print(f"❌ {error}")
             return 1
 
         if merged_file:
             merged_any = True
-            print(f"✅ Merged {section_dir.name} → {merged_file}")
+            print(f"✅ Merged {category_dir.name} → {merged_file}")
         else:
-            print(f"⚠️  No JSON files found in {section_dir}")
+            print(f"⚠️  No JSON files found in {category_dir}")
 
     if not merged_any:
         print("⚠️  No JSON files were merged")
         return 1
 
-    print("\n✅ All available sections merged successfully")
+    print("\n✅ All available categories merged successfully")
     return 0
 
 
@@ -88,7 +88,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--root",
         type=Path,
         default=Path("data/output"),
-        help="Root directory containing section subdirectories (default: data/output)",
+        help="Root directory containing category subdirectories (default: data/output)",
     )
     return parser
 

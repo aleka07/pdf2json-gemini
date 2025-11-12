@@ -11,7 +11,7 @@ import threading
 import time
 from datetime import datetime
 
-def setup_logging(section_code: str = None):
+def setup_logging(category_code: str = None):
     """Set up logging to both file and console."""
     # Create logs directory
     log_dir = Path("logs")
@@ -20,8 +20,8 @@ def setup_logging(section_code: str = None):
     # Generate timestamp for log filename
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
-    if section_code:
-        log_filename = f"processing_{section_code}_{timestamp}.log"
+    if category_code:
+        log_filename = f"processing_{category_code}_{timestamp}.log"
     else:
         log_filename = f"processing_{timestamp}.log"
 
@@ -98,12 +98,12 @@ class PDFProcessor:
             logger.error(f"Error deleting file {file_id}: {str(e)}")
             return False
 
-    def generate_prompt(self, section_code: str, sequence_id: int) -> str:
+    def generate_prompt(self, category_code: str, sequence_id: int) -> str:
         """
         Generate the processing prompt based on prompt.md requirements.
 
         Args:
-            section_code (str): Project section code (e.g., "3.1")
+            category_code (str): Category identifier (e.g., "ML", "IoT", "security")
             sequence_id (int): Sequential ID for the paper
 
         Returns:
@@ -120,7 +120,7 @@ class PDFProcessor:
 
         # Add specific instructions for this paper
         paper_prompt = f"""
-Section Code: {section_code}
+Category Code: {category_code}
 Sequence ID: {sequence_id}
 
 {prompt_template}
@@ -130,13 +130,13 @@ Please analyze the uploaded PDF and generate a JSON response following the exact
 
         return paper_prompt
 
-    def process_pdf_with_gemini(self, file_id: str, section_code: str, sequence_id: int) -> Optional[Dict[Any, Any]]:
+    def process_pdf_with_gemini(self, file_id: str, category_code: str, sequence_id: int) -> Optional[Dict[Any, Any]]:
         """
         Process uploaded PDF with Gemini API to generate structured JSON.
 
         Args:
             file_id (str): Gemini file ID
-            section_code (str): Project section code
+            category_code (str): Category identifier
             sequence_id (int): Sequential ID for the paper
 
         Returns:
@@ -146,7 +146,7 @@ Please analyze the uploaded PDF and generate a JSON response following the exact
             logger.info(f"Processing PDF with Gemini. File ID: {file_id}")
 
             # Generate the prompt
-            prompt = self.generate_prompt(section_code, sequence_id)
+            prompt = self.generate_prompt(category_code, sequence_id)
 
             # Get the uploaded file
             uploaded_file = genai.get_file(file_id)
@@ -195,21 +195,21 @@ Please analyze the uploaded PDF and generate a JSON response following the exact
             logger.error(f"Error processing PDF with Gemini: {str(e)}")
             return None
 
-    def save_json_output(self, json_data: Dict[Any, Any], paper_id: str, section_code: str) -> bool:
+    def save_json_output(self, json_data: Dict[Any, Any], paper_id: str, category_code: str) -> bool:
         """
-        Save JSON data to output file in section-specific directory.
+        Save JSON data to output file in category-specific directory.
 
         Args:
             json_data (Dict): JSON data to save
             paper_id (str): Paper ID for filename
-            section_code (str): Section code for directory structure
+            category_code (str): Category identifier for directory structure
 
         Returns:
             bool: True if successful, False if failed
         """
         try:
-            # Create section-specific output directory
-            output_dir = Path("data/output") / section_code
+            # Create category-specific output directory
+            output_dir = Path("data/output") / category_code
             output_dir.mkdir(parents=True, exist_ok=True)
 
             output_path = output_dir / f"{paper_id}.json"
@@ -224,13 +224,13 @@ Please analyze the uploaded PDF and generate a JSON response following the exact
             logger.error(f"Error saving JSON for {paper_id}: {str(e)}")
             return False
 
-    def process_single_pdf(self, pdf_path: str, section_code: str, sequence_id: int) -> bool:
+    def process_single_pdf(self, pdf_path: str, category_code: str, sequence_id: int) -> bool:
         """
         Complete workflow: upload PDF → process with Gemini → save JSON → delete from cloud.
 
         Args:
             pdf_path (str): Path to PDF file
-            section_code (str): Project section code
+            category_code (str): Category identifier
             sequence_id (int): Sequential ID for the paper
 
         Returns:
@@ -244,13 +244,13 @@ Please analyze the uploaded PDF and generate a JSON response following the exact
                 return False
 
             # Step 2: Process with Gemini
-            json_data = self.process_pdf_with_gemini(file_id, section_code, sequence_id)
+            json_data = self.process_pdf_with_gemini(file_id, category_code, sequence_id)
             if not json_data:
                 return False
 
             # Step 3: Generate paper ID and save JSON
-            paper_id = f"{section_code}-{sequence_id:03d}"
-            success = self.save_json_output(json_data, paper_id, section_code)
+            paper_id = f"{category_code}-{sequence_id:03d}"
+            success = self.save_json_output(json_data, paper_id, category_code)
 
             return success
 
@@ -263,20 +263,20 @@ Please analyze the uploaded PDF and generate a JSON response following the exact
             if file_id:
                 self.delete_file_from_gemini(file_id)
 
-    def process_pdfs_in_directory(self, directory_path: str, section_code: str) -> Dict[str, Any]:
+    def process_pdfs_in_directory(self, directory_path: str, category_code: str) -> Dict[str, Any]:
         """
         Process all PDFs in a directory sequentially with comprehensive logging.
 
         Args:
             directory_path (str): Path to directory containing PDFs
-            section_code (str): Project section code (e.g., "3.1")
+            category_code (str): Project section code (e.g., "3.1")
 
         Returns:
             Dict[str, Any]: Processing results with statistics
         """
         # Set up logging for this processing session
         global logger
-        logger, log_path = setup_logging(section_code)
+        logger, log_path = setup_logging(category_code)
         directory = Path(directory_path)
         if not directory.exists() or not directory.is_dir():
             logger.error(f"Directory not found: {directory_path}")
@@ -311,13 +311,13 @@ Please analyze the uploaded PDF and generate a JSON response following the exact
             file_result = {
                 "filename": pdf_file.name,
                 "sequence_id": idx,
-                "paper_id": f"{section_code}-{idx:03d}",
+                "paper_id": f"{category_code}-{idx:03d}",
                 "success": False,
                 "error": None
             }
 
             try:
-                success = self.process_single_pdf(str(pdf_file), section_code, idx)
+                success = self.process_single_pdf(str(pdf_file), category_code, idx)
                 if success:
                     file_result["success"] = True
                     results["processed"] += 1
@@ -350,21 +350,21 @@ Please analyze the uploaded PDF and generate a JSON response following the exact
         """)
 
         # Save processing summary to log file
-        self.save_processing_summary(results, section_code)
+        self.save_processing_summary(results, category_code)
 
         return results
 
-    def save_processing_summary(self, results: Dict[str, Any], section_code: str):
+    def save_processing_summary(self, results: Dict[str, Any], category_code: str):
         """Save processing summary and progress to a file for resume capability."""
         summary_dir = Path("logs") / "summaries"
         summary_dir.mkdir(parents=True, exist_ok=True)
 
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        summary_file = summary_dir / f"summary_{section_code}_{timestamp}.json"
+        summary_file = summary_dir / f"summary_{category_code}_{timestamp}.json"
 
         summary_data = {
             "timestamp": timestamp,
-            "section_code": section_code,
+            "category_code": category_code,
             "results": results,
             "processed_files": [f["filename"] for f in results.get("files", []) if f.get("success")],
             "failed_files": [f["filename"] for f in results.get("files", []) if not f.get("success")],
@@ -378,9 +378,9 @@ Please analyze the uploaded PDF and generate a JSON response following the exact
         except Exception as e:
             logger.error(f"Failed to save processing summary: {str(e)}")
 
-    def get_already_processed_files(self, section_code: str) -> set:
+    def get_already_processed_files(self, category_code: str) -> set:
         """Check which files have already been processed in this section."""
-        output_dir = Path("data/output") / section_code
+        output_dir = Path("data/output") / category_code
         processed_files = set()
 
         if output_dir.exists():
@@ -394,16 +394,16 @@ Please analyze the uploaded PDF and generate a JSON response following the exact
                 except (ValueError, IndexError):
                     continue
 
-        logger.info(f"Found {len(processed_files)} already processed files in section {section_code}")
+        logger.info(f"Found {len(processed_files)} already processed files in section {category_code}")
         return processed_files
 
-    def process_pdfs_with_resume(self, directory_path: str, section_code: str, start_from: int = 1) -> Dict[str, Any]:
+    def process_pdfs_with_resume(self, directory_path: str, category_code: str, start_from: int = 1) -> Dict[str, Any]:
         """
         Process PDFs with resume capability.
 
         Args:
             directory_path (str): Path to directory containing PDFs
-            section_code (str): Project section code
+            category_code (str): Project section code
             start_from (int): Sequence number to start from
 
         Returns:
@@ -411,7 +411,7 @@ Please analyze the uploaded PDF and generate a JSON response following the exact
         """
         # Set up logging
         global logger
-        logger, _ = setup_logging(section_code)
+        logger, _ = setup_logging(category_code)
 
         directory = Path(directory_path)
         if not directory.exists() or not directory.is_dir():
@@ -431,7 +431,7 @@ Please analyze the uploaded PDF and generate a JSON response following the exact
         logger.info("")
 
         # Check already processed files
-        already_processed = self.get_already_processed_files(section_code)
+        already_processed = self.get_already_processed_files(category_code)
 
         logger.info(f"Found {len(pdf_files)} total PDF files")
         logger.info(f"Starting from sequence {start_from}")
@@ -462,7 +462,7 @@ Please analyze the uploaded PDF and generate a JSON response following the exact
             file_result = {
                 "filename": pdf_file.name,
                 "sequence_id": idx,
-                "paper_id": f"{section_code}-{idx:03d}",
+                "paper_id": f"{category_code}-{idx:03d}",
                 "success": False,
                 "error": None,
                 "start_time": datetime.now().isoformat(),
@@ -470,7 +470,7 @@ Please analyze the uploaded PDF and generate a JSON response following the exact
             }
 
             try:
-                success = self.process_single_pdf(str(pdf_file), section_code, idx)
+                success = self.process_single_pdf(str(pdf_file), category_code, idx)
                 file_result["end_time"] = datetime.now().isoformat()
 
                 if success:
@@ -510,14 +510,14 @@ Please analyze the uploaded PDF and generate a JSON response following the exact
         - Success rate: {(results['processed']/(results['total_files']-results['skipped'])*100):.1f}%
         """)
 
-        self.save_processing_summary(results, section_code)
+        self.save_processing_summary(results, category_code)
         return results
 
-    def process_pdfs_in_directory_with_resume(self, directory_path: str, section_code: str, start_from: int = 1) -> Dict[str, Any]:
+    def process_pdfs_in_directory_with_resume(self, directory_path: str, category_code: str, start_from: int = 1) -> Dict[str, Any]:
         """Process PDFs starting from a specific sequence number."""
         # Set up logging
         global logger
-        logger, _ = setup_logging(section_code)
+        logger, _ = setup_logging(category_code)
 
         directory = Path(directory_path)
         if not directory.exists() or not directory.is_dir():
@@ -525,7 +525,7 @@ Please analyze the uploaded PDF and generate a JSON response following the exact
             return {"success": False, "error": "Directory not found"}
 
         # Check what's already processed
-        output_dir = Path("data/output") / section_code
+        output_dir = Path("data/output") / category_code
         processed_files = set()
         if output_dir.exists():
             for json_file in output_dir.glob("*.json"):
@@ -559,7 +559,7 @@ Please analyze the uploaded PDF and generate a JSON response following the exact
 
         # Process each PDF, skipping already processed ones
         for idx, pdf_file in enumerate(pdf_files, start_from):
-            paper_id = f"{section_code}-{idx:03d}"
+            paper_id = f"{category_code}-{idx:03d}"
 
             # Skip if already processed
             if paper_id in processed_files:
@@ -586,7 +586,7 @@ Please analyze the uploaded PDF and generate a JSON response following the exact
             }
 
             try:
-                success = self.process_single_pdf(str(pdf_file), section_code, idx)
+                success = self.process_single_pdf(str(pdf_file), category_code, idx)
                 file_result["end_time"] = datetime.now().isoformat()
 
                 if success:
@@ -629,17 +629,17 @@ Please analyze the uploaded PDF and generate a JSON response following the exact
         - Success rate: {success_rate:.1f}%
         """)
 
-        self.save_processing_summary(results, section_code)
+        self.save_processing_summary(results, category_code)
         return results
 
-    def process_single_pdf_with_logging(self, pdf_file: Path, section_code: str, sequence_id: int) -> Dict[str, Any]:
+    def process_single_pdf_with_logging(self, pdf_file: Path, category_code: str, sequence_id: int) -> Dict[str, Any]:
         """
         Thread-safe wrapper for processing a single PDF with detailed logging.
         """
         file_result = {
             "filename": pdf_file.name,
             "sequence_id": sequence_id,
-            "paper_id": f"{section_code}-{sequence_id:03d}",
+            "paper_id": f"{category_code}-{sequence_id:03d}",
             "success": False,
             "error": None,
             "start_time": datetime.now().isoformat(),
@@ -648,7 +648,7 @@ Please analyze the uploaded PDF and generate a JSON response following the exact
 
         try:
             logger.info(f"🔄 [{sequence_id:03d}] Starting: {pdf_file.name}")
-            success = self.process_single_pdf(str(pdf_file), section_code, sequence_id)
+            success = self.process_single_pdf(str(pdf_file), category_code, sequence_id)
             file_result["end_time"] = datetime.now().isoformat()
 
             if success:
@@ -665,18 +665,18 @@ Please analyze the uploaded PDF and generate a JSON response following the exact
 
         return file_result
 
-    def process_pdfs_parallel(self, directory_path: str, section_code: str, max_workers: int = 3) -> Dict[str, Any]:
+    def process_pdfs_parallel(self, directory_path: str, category_code: str, max_workers: int = 3) -> Dict[str, Any]:
         """
         Process PDFs in parallel using ThreadPoolExecutor.
 
         Args:
             directory_path (str): Path to directory containing PDFs
-            section_code (str): Project section code
+            category_code (str): Project section code
             max_workers (int): Maximum number of parallel workers (default: 3)
         """
         # Set up logging
         global logger
-        logger, _ = setup_logging(section_code)
+        logger, _ = setup_logging(category_code)
 
         directory = Path(directory_path)
         if not directory.exists() or not directory.is_dir():
@@ -716,7 +716,7 @@ Please analyze the uploaded PDF and generate a JSON response following the exact
                     future = executor.submit(
                         self.process_single_pdf_with_logging,
                         pdf_file,
-                        section_code,
+                        category_code,
                         idx
                     )
                     future_to_pdf[future] = (pdf_file, idx)
@@ -759,5 +759,5 @@ Please analyze the uploaded PDF and generate a JSON response following the exact
         - Workers used: {max_workers}
         """)
 
-        self.save_processing_summary(results, section_code)
+        self.save_processing_summary(results, category_code)
         return results
